@@ -1,0 +1,14 @@
+{
+  "name": "image-generator-backend",
+  "version": "1.0.0",
+  "description": "Backend para generar imágenes con ModelsLab",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "express": "^4.21.2"
+  }
+}
