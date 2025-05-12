@@ -14,7 +14,7 @@ app.use((req, res, next) => {
 });
 
 //const PROMPTCHAN_API_KEY = process.env.PROMPTCHAN_API_KEY;
-const PROMPTCHAN_API_KEY = '4gVNUWk9XLLFmAREhYHjXg'; 
+const PROMPTCHAN_API_KEY = 'Nh6W5dBiIjX4Kex6pF2nV0BfR0IckLD6g2oXY6DmpOSt0iOIruoUeucPL6OH'; 
 // Endpoint para generar imagen
 app.post('/api/generate-image', async (req, res) => {
   const { prompt } = req.body;
@@ -30,7 +30,7 @@ app.post('/api/generate-image', async (req, res) => {
 
   try {
     const response = await axios.post(
-      'https://prod.aicloudnetservices.com/', // Cambia al endpoint real de Promptchan AI
+      'https://api.promptchan.ai/v1/generate', // Cambia al endpoint real de Promptchan AI
       {
         api_key: PROMPTCHAN_API_KEY, // Cambia según el formato requerido por Promptchan
         prompt,
