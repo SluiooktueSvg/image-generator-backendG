@@ -25,6 +25,8 @@ app.post('/api/generate-image', async (req, res) => {
   if (!prompt || forbiddenWords.some(word => lowerPrompt.includes(word))) {
     return res.status(400).json({ error: 'El contenido ingresado no es permitido. Evita referencias a menores o contenido ilegal.' });
   }
+  console.log('API Key:', MODELSlAB_API_KEY);
+  console.log('Request body:', { key: MODELSlAB_API_KEY, prompt });
 
   try {
     const response = await axios.post(
