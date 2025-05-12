@@ -1,4 +1,4 @@
-// require('dotenv').config(); // Comenta esta línea
+require('dotenv').config(); // Comenta esta línea
 const axios = require('axios');
 const app = express();
 
