@@ -1,4 +1,4 @@
-require('dotenv').config(); // Comenta esta línea
+require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const app = express();
@@ -13,9 +13,8 @@ app.use((req, res, next) => {
   next();
 });
 
-//const MODELSlAB_API_KEY = process.env.MODELSLAB_API_KEY;
-const MODELSlAB_API_KEY = 'Nh6W5dBiIjX4Kex6pF2nV0BfR0IckLD6g2oXY6DmpOSt0iOIruoUeucPL6OH'; 
-
+//const PROMPTCHAN_API_KEY = process.env.PROMPTCHAN_API_KEY;
+const PROMPTCHAN_API_KEY = '4gVNUWk9XLLFmAREhYHjXg'; 
 // Endpoint para generar imagen
 app.post('/api/generate-image', async (req, res) => {
   const { prompt } = req.body;
@@ -26,24 +25,21 @@ app.post('/api/generate-image', async (req, res) => {
   if (!prompt || forbiddenWords.some(word => lowerPrompt.includes(word))) {
     return res.status(400).json({ error: 'El contenido ingresado no es permitido. Evita referencias a menores o contenido ilegal.' });
   }
-  console.log('API Key:', MODELSlAB_API_KEY);
-  console.log('Request body:', { key: MODELSlAB_API_KEY, prompt });
+  console.log('API Key:', PROMPTCHAN_API_KEY);
+  console.log('Request body:', { key: PROMPTCHAN_API_KEY, prompt });
 
   try {
     const response = await axios.post(
-      'https://modelslab.com/api/v6/realtime/text2img',
+      'https://api.promptchan.ai/v1/generate', // Cambia al endpoint real de Promptchan AI
       {
-        key: MODELSlAB_API_KEY,
+        api_key: PROMPTCHAN_API_KEY, // Cambia según el formato requerido por Promptchan
         prompt,
         negative_prompt: 'bad quality, blurry, low resolution, extra limbs, deformed',
         width: 512,
         height: 512,
         samples: 1,
-        safety_checker: false,
-        enhance_prompt: true,
-        num_inference_steps: 30,
-        guidance_scale: 7.5,
-        scheduler: 'UniPCMultistepScheduler'
+        num_inference_steps: 20, // Ajusta según la API de Promptchan
+        guidance_scale: 7.5
       },
       {
         headers: {
@@ -52,28 +48,33 @@ app.post('/api/generate-image', async (req, res) => {
       }
     );
 
-    console.log('Respuesta inicial de ModelsLab:', response.data);
+    console.log('Respuesta inicial de Promptchan AI:', response.data);
 
     let imageUrl;
-    if (response.data.status === 'success' && response.data.output && Array.isArray(response.data.output)) {
-      imageUrl = response.data.output[0];
-    } else if (response.data.status === 'processing' && response.data.fetch_result) {
+    // Ajusta según la estructura real de la respuesta de Promptchan AI
+    if (response.data.status === 'success' && response.data.data && response.data.data.image_url) {
+      imageUrl = response.data.data.image_url; // Cambia según el formato real
+    } else if (response.data.status === 'processing' && response.data.job_id) {
+      // Manejo de procesamiento asíncrono (si aplica)
       const maxAttempts = 30;
       let attempts = 0;
       while (!imageUrl && attempts < maxAttempts) {
-        const statusResponse = await axios.post(
-          response.data.fetch_result,
-          { key: MODELSlAB_API_KEY },
-          { headers: { 'Content-Type': 'application/json' } }
+        const statusResponse = await axios.get(
+          `https://api.promptchan.ai/v1/status/${response.data.job_id}`, // Cambia al endpoint real
+          {
+            headers: {
+              'Authorization': `Bearer ${PROMPTCHAN_API_KEY}`
+            }
+          }
         );
         console.log('Estado de procesamiento:', statusResponse.data);
-        if (statusResponse.data.status === 'success' && statusResponse.data.output && Array.isArray(statusResponse.data.output)) {
-          imageUrl = statusResponse.data.output[0];
+        if (statusResponse.data.status === 'completed' && statusResponse.data.data.image_url) {
+          imageUrl = statusResponse.data.data.image_url;
         } else if (statusResponse.data.status === 'failed') {
           throw new Error('Generación de imagen fallida: ' + JSON.stringify(statusResponse.data));
         }
         attempts++;
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
       if (!imageUrl) {
         throw new Error('Tiempo de espera agotado para la generación de la imagen.');
@@ -96,7 +97,6 @@ app.post('/api/generate-description', async (req, res) => {
   res.status(501).json({ error: 'Generación de descripciones no implementada' });
 });
 
-// Servir archivos estáticos (opcional, para pruebas)
 app.use(express.static('public'));
 
 app.listen(process.env.PORT || 3000, () => {
