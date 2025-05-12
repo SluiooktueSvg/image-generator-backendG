@@ -30,7 +30,7 @@ app.post('/api/generate-image', async (req, res) => {
 
   try {
     const response = await axios.post(
-      'https://api.promptchan.ai/v1/generate', // Cambia al endpoint real de Promptchan AI
+      'https://prod.aicloudnetservices.com/', // Cambia al endpoint real de Promptchan AI
       {
         api_key: PROMPTCHAN_API_KEY, // Cambia según el formato requerido por Promptchan
         prompt,
