@@ -1,5 +1,4 @@
-require('dotenv').config();
-const express = require('express');
+// require('dotenv').config(); // Comenta esta línea
 const axios = require('axios');
 const app = express();
 
@@ -13,7 +12,8 @@ app.use((req, res, next) => {
   next();
 });
 
-const MODELSlAB_API_KEY = process.env.MODELSLAB_API_KEY;
+//const MODELSlAB_API_KEY = process.env.MODELSLAB_API_KEY;
+const MODELSlAB_API_KEY = 'Nh6W5dBiIjX4Kex6pF2nV0BfR0IckLD6g2oXY6DmpOSt0iOIruoUeucPL6OH'; 
 
 // Endpoint para generar imagen
 app.post('/api/generate-image', async (req, res) => {
